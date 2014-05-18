@@ -12,8 +12,10 @@ How to use?
 
 2. Add a new LABLE to your pxelinux.cfg with:
 
+```
     KERNEL syslinux/memdisk
     APPEND initrd=supermicro/C7Z87OC4.423.img
+```
 
 3. Then PXE boot your system to this image. And either:
 	* A. Watch your BIOS upgrade successfully.
