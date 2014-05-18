@@ -1,0 +1,13 @@
+#
+MENU INCLUDE menu/greenkey
+
+#MENU INCLUDE menu/f20.x86_64
+#MENU INCLUDE menu/f19.x86_64
+#MENU INCLUDE menu/f14.x86_64
+#MENU INCLUDE menu/f14.i386
+#MENU INCLUDE menu/f13.x86_64
+#MENU INCLUDE menu/f12.x86_64
+
+#MENU INCLUDE menu/cos53.x86_64
+
+#MENU INCLUDE menu/freedos

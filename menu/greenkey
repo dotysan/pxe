@@ -1,0 +1,174 @@
+# wait for 10 seconds before auto boot
+TIMEOUT 100
+# auto-reload PXE boot on timeout
+ONTIMEOUT pxelinux.0
+#ONTIMEOUT disk
+
+MENU BACKGROUND menu/benhead.png
+# title may get overridden later?
+MENU TITLE GreenKey Boot Menu
+# required for the [Tab] and [Esc] keys to work in menus
+#MENU MASTER PASSWD $4$salt$TODO$
+
+# move to left
+MENU MARGIN 0
+MENU WIDTH 42
+
+# height of menu box
+MENU ROWS 17
+
+# password prompt box appears here
+MENU PASSWORDROW 22
+# display countdown here
+MENU TIMEOUTROW	22
+# start any additional output here (also workaround bug where it cannot handle default -1 if DISPLAY was used)
+MENU ENDROW	22
+
+# bright green text on blue/transparent background
+MENU COLOR title	1;32;44		#c000ff00 #00000000 std
+# green text on blue/transparent background
+MENU COLOR border	32;44		#40008000 #00000000 std
+# blinking bright green text on black/transparent background
+MENU COLOR timeout	1;5;32;40	#c040ff40 #00000000 std
+# dark blue text on black/transparent background
+MENU COLOR help		1;34;40		#d00000ff #00000000 std
+
+LABEL boot
+	MENU DISABLE
+	MENU LABEL Boot:
+
+LABEL pxelinux.0
+	MENU DEFAULT
+	MENU INDENT 1
+	MENU LABEL Reload PXE ^Network Boot ->
+	TEXT HELP
+ reload these network-driven boot menus
+	ENDTEXT
+LABEL disk
+	MENU INDENT 1
+	MENU LABEL Local ^Boot Next BIOS Device
+	TEXT HELP
+ boot whatever device is next in BIOS order
+	ENDTEXT
+	LOCALBOOT 0
+LABEL chain
+	MENU INDENT 1
+	MENU LABEL ^Chain Boot First Disk
+	TEXT HELP
+ boot specifically first partition on first disk
+	ENDTEXT
+	COM32 syslinux/chain.c32
+	# first partition on first local disk
+	APPEND hd0 0
+#LABEL gpxelinux.0
+#	MENU LABEL ^gPXE Net Boot 0.9.5 (EXPERIMENTAL)
+#	MENU INDENT 1
+#	TEXT HELP
+# next-generation network booting
+#	ENDTEXT
+LABEL reboot
+	MENU INDENT 1
+	MENU LABEL ^Warm Reboot
+	TEXT HELP
+ reboot system without full BIOS checks
+	ENDTEXT
+	COM32 syslinux/reboot.c32
+	APPEND -w
+
+#MENU SEPARATOR
+#-------------------------------------------------------------------------------
+LABEL info
+	MENU LABEL Information:
+	MENU DISABLE
+
+LABEL hdt
+	MENU INDENT 1
+	MENU LABEL ^Hardware Detection Tool ->
+	TEXT HELP
+ reun HDT diagnostics
+	ENDTEXT
+        COM32 syslinux/hdt.c32
+	APPEND pciids=pciids/pci.ids
+#	APPEND modules_pcimap=modules.pcimap modules_alias=modules.alias pciids=pci.ids quiet
+#	APPEND memtest=memtest
+
+#LABEL dmi
+#	MENU LABEL ^Desktop Management Interface
+#	MENU INDENT 1
+#	KERNEL syslinux/dmitest.c32
+
+## these rely on boot: prompt for pausing after output
+#LABEL cpuid
+#	MENU LABEL Display ^Processor Identifcation
+#	MENU INDENT 1
+#	KERNEL syslinux/cpuidtest.c32
+#LABEL pci
+#	MENU LABEL Display PCI Bus
+#	MENU INDENT 1
+#	# beware this tries to tftp /pxe/pci.ids
+#	KERNEL syslinux/pcitest.c32
+#LABEL meminfo
+#	MENU LABEL Display Memory Map
+#	MENU INDENT 1
+#	KERNEL syslinux/meminfo.c32
+LABEL vesa
+	MENU LABEL Display Available ^VESA Modes ->
+	MENU INDENT 1
+	COM32 syslinux/vesainfo.c32
+
+#MENU SEPARATOR
+#LABEL hacking
+#	MENU LABEL Hacking:
+#	MENU DISABLE
+
+LABEL memtest4
+	MENU LABEL Test ^Memory
+	MENU INDENT 1
+	TEXT HELP
+ run Memtest86+ v4.10 burn-in program
+	ENDTEXT
+	COM32 syslinux/ifcpu64.c32
+	APPEND fedora/20.x86_64/memtest -- fedora/rawhide.i386/memtest
+
+#LABEL pxeknife
+#	MENU LABEL PXE Knife
+#	MENU INDENT 1
+#	TEXT HELP
+# generic utilities
+#	ENDTEXT
+#	KERNEL syslinux/menu.c32
+#	APPEND pxeknife/pxeknife.conf
+# TODO: does PXE Knife still expect more c32 modules in pxe root?
+
+##MENU SEPARATOR
+#LABEL dash
+#	MENU LABEL - - - - - - - - - -
+#	MENU DISABLE
+##-------------------------------------------------------------------------------
+#LABEL freedos-menu
+#	MENU LABEL FreeDOS:
+#	MENU DISABLE
+#
+#LABEL FreeDOS
+#	MENU INDENT 1
+#	MENU LABEL FreeDOS Live
+#	KERNEL syslinux/memdisk                                                                                                                                   
+##	APPEND initrd=freedos/64MB.img
+##	APPEND ro keeppxe
+#	INITRD freedos/FAT12.img.gz
+#	APPEND floppy keeppxe
+## must use floppy emulation since we put the FAT12 filesystem on a raw unpartitioned device
+## TODO: create a dos partition inside and try this:
+##	APPEND harddisk keeppxe
+#
+#LABEL FreeDOS-install
+#	MENU INDENT 1
+#	MENU LABEL FreeDOS Install
+#	KERNEL syslinux/memdisk                                                                                                                                   
+#	INITRD freedos/fd11src.iso
+#	APPEND iso
+#
+#LABEL dash
+#	MENU LABEL - - - - - - - - - -
+#	MENU DISABLE
+#
